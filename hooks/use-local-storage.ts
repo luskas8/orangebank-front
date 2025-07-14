@@ -12,12 +12,19 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T)
     try {
       // Pega do localStorage pela key
       const item = window.localStorage.getItem(key);
+      
+      // Se não existe item, retorna valor inicial
+      if (item === null) {
+        return initialValue;
+      }
+      
       // Para strings simples (como tokens), não faz parse JSON
       if (typeof initialValue === 'string') {
-        return (item as T) || initialValue;
+        return (item as T);
       }
-      // Para outros tipos, parseia JSON armazenado ou se nenhum retorna initialValue
-      return item ? JSON.parse(item) : initialValue;
+      
+      // Para outros tipos, parseia JSON armazenado
+      return JSON.parse(item);
     } catch (error) {
       // Se erro também retorna initialValue
       console.error('Erro ao acessar localStorage:', error);

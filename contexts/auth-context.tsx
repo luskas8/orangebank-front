@@ -30,12 +30,13 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useLocalStorage<string | null>('token', null);
+  const [token, setToken] = useLocalStorage<string | null>('token', 'string' as any);
   const isClient = useIsClient();
   const { toast } = useToast();
   
   // Use ref to track if initialization has already been attempted
   const hasInitialized = useRef(false);
+  const lastTokenValue = useRef<string | null>(null);
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -43,8 +44,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!isClient) {
         return;
       }
+      // Se o token não mudou, não faz nada
+      if (hasInitialized.current && lastTokenValue.current === token) {
+        return;
+      }
       
       hasInitialized.current = true;
+      lastTokenValue.current = token;
       
       try {
         if (token) {
