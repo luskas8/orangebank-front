@@ -89,13 +89,13 @@ export const AssetsList: React.FC = () => {
                         {asset.name}
                       </p>
                     </div>
-                    <Badge variant={asset.variation >= 0 ? "default" : "destructive"}>
-                      {asset.variation >= 0 ? (
+                    <Badge variant={(asset.variation ?? 0) >= 0 ? "default" : "destructive"}>
+                      {(asset.variation ?? 0) >= 0 ? (
                         <TrendingUp className="w-3 h-3 mr-1" />
                       ) : (
                         <TrendingDown className="w-3 h-3 mr-1" />
                       )}
-                      {formatPercent(asset.variation)}
+                      {formatPercent(asset.variation ?? 0)}
                     </Badge>
                   </div>
                 </CardHeader>
@@ -110,7 +110,7 @@ export const AssetsList: React.FC = () => {
                     
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Anterior:</span>
-                      <span>{formatCurrency(asset.previousPrice)}</span>
+                      <span>{formatCurrency(asset.previousPrice ?? 0)}</span>
                     </div>
 
                     <Button

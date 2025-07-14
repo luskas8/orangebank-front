@@ -63,6 +63,7 @@ export interface RegisterRequest {
   email: string;
   cpf: string;
   password: string;
+  birthDate: string;
 }
 
 export interface AuthResponse {
@@ -81,26 +82,27 @@ export interface WithdrawRequest {
 }
 
 export interface TransferRequest {
-  fromAccountId: string;
   toAccountId: string;
+  fromAccountType: 'current_account' | 'investment_account';
   amount: number;
+  description?: string;
+}
+
+export interface CreateAccountRequest {
+  type: 'current_account' | 'investment_account';
+  balance?: number;
+  active?: boolean;
+  userId: number;
 }
 
 export interface BuyAssetRequest {
-  accountId: string;
-  assetId: string;
   assetSymbol: string;
   quantity: number;
-  assetType?: 'stock' | 'fixed-income';
 }
 
 export interface SellAssetRequest {
-  accountId: string;
-  assetId: string;
   assetSymbol: string;
-  positionId?: string;
   quantity: number;
-  assetType?: 'stock' | 'fixed-income';
 }
 
 export interface ApiResponse<T> {

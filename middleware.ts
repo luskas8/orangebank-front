@@ -25,11 +25,6 @@ export function middleware(request: NextRequest) {
     });
   }
 
-  // Se está na página inicial, redireciona para login
-  if (request.nextUrl.pathname === '/') {
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
-
   return response;
 }
 

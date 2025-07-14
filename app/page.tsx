@@ -13,8 +13,10 @@ export default function HomePage() {
   useEffect(() => {
     if (!loading) {
       if (isAuthenticated) {
+        console.log('Usuário autenticado, redirecionando para dashboard...');
         router.replace('/dashboard');
       } else {
+        console.log('Usuário não autenticado, redirecionando para login...');
         router.replace('/login');
       }
     }

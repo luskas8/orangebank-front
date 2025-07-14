@@ -20,11 +20,12 @@ import { ArrowRightLeft, DollarSign, ArrowLeft, AlertTriangle } from 'lucide-rea
 import Link from 'next/link';
 
 const transferSchema = z.object({
-  fromAccountId: z.string().min(1, 'Conta de origem é obrigatória'),
+  fromAccountType: z.enum(['current_account', 'investment_account']),
   toAccountId: z.string().min(1, 'Conta de destino é obrigatória'),
   amount: z.string()
     .min(1, 'Valor é obrigatório')
     .refine((val) => !isNaN(Number(val)) && Number(val) > 0, 'Valor deve ser maior que zero'),
+  description: z.string().optional(),
 });
 
 type TransferForm = z.infer<typeof transferSchema>;
@@ -47,11 +48,13 @@ export const TransferContent: React.FC = () => {
     resolver: zodResolver(transferSchema),
   });
 
-  const watchedFromAccount = watch('fromAccountId');
+  const watchedFromAccountType = watch('fromAccountType');
   const watchedToAccount = watch('toAccountId');
   const watchedAmount = watch('amount');
   
-  const fromAccount = accounts.find(acc => acc.id === watchedFromAccount);
+  const fromAccount = accounts.find(acc => 
+    acc.type === (watchedFromAccountType === 'current_account' ? 'current' : 'investment')
+  );
   const numericAmount = watchedAmount ? Number(watchedAmount) : 0;
 
   useEffect(() => {
@@ -75,7 +78,7 @@ export const TransferContent: React.FC = () => {
   }, [toast]);
 
   const onSubmit = async (data: TransferForm) => {
-    if (data.fromAccountId === data.toAccountId) {
+    if (isSameAccount) {
       toast({
         title: "Erro na transferência",
         description: "Não é possível transferir para a mesma conta",
@@ -85,7 +88,7 @@ export const TransferContent: React.FC = () => {
     }
 
     const amount = Number(data.amount);
-    const sourceAccount = accounts.find(acc => acc.id === data.fromAccountId);
+    const sourceAccount = fromAccount;
     
     if (sourceAccount && amount > sourceAccount.balance) {
       toast({
@@ -99,9 +102,10 @@ export const TransferContent: React.FC = () => {
     setSubmitting(true);
     try {
       await accountsApi.transfer({
-        fromAccountId: data.fromAccountId,
+        fromAccountType: data.fromAccountType,
         toAccountId: data.toAccountId,
         amount,
+        description: data.description,
       });
 
       toast({
@@ -166,7 +170,8 @@ export const TransferContent: React.FC = () => {
   }
 
   const hasInsufficientBalance = fromAccount && numericAmount > fromAccount.balance;
-  const isSameAccount = watchedFromAccount === watchedToAccount;
+  const isSameAccount = watchedFromAccountType && watchedToAccount && 
+    fromAccount?.id === watchedToAccount;
 
   return (
     <MainLayout>
@@ -206,22 +211,23 @@ export const TransferContent: React.FC = () => {
               <div className="space-y-2">
                 <Label>Conta de Origem</Label>
                 <Select
-                  onValueChange={(value) => setValue('fromAccountId', value)}
-                  value={watchedFromAccount || ''}
+                  onValueChange={(value) => setValue('fromAccountType', value as 'current_account' | 'investment_account')}
+                  value={watchedFromAccountType || ''}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione a conta de origem" />
                   </SelectTrigger>
                   <SelectContent>
-                    {accounts.map((account) => (
-                      <SelectItem key={account.id} value={account.id}>
-                        {getAccountName(account.type)} - {formatCurrency(account.balance)}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="current_account">
+                      Conta Corrente - {formatCurrency(accounts.find(acc => acc.type === 'current')?.balance || 0)}
+                    </SelectItem>
+                    <SelectItem value="investment_account">
+                      Conta Investimento - {formatCurrency(accounts.find(acc => acc.type === 'investment')?.balance || 0)}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
-                {errors.fromAccountId && (
-                  <p className="text-sm text-red-600">{errors.fromAccountId.message}</p>
+                {errors.fromAccountType && (
+                  <p className="text-sm text-red-600">{errors.fromAccountType.message}</p>
                 )}
               </div>
 
@@ -236,7 +242,7 @@ export const TransferContent: React.FC = () => {
                   </SelectTrigger>
                   <SelectContent>
                     {accounts
-                      .filter(account => account.id !== watchedFromAccount)
+                      .filter(account => fromAccount ? account.id !== fromAccount.id : true)
                       .map((account) => (
                         <SelectItem key={account.id} value={account.id}>
                           {getAccountName(account.type)} - {formatCurrency(account.balance)}
@@ -247,7 +253,7 @@ export const TransferContent: React.FC = () => {
                 {errors.toAccountId && (
                   <p className="text-sm text-red-600">{errors.toAccountId.message}</p>
                 )}
-                {isSameAccount && watchedFromAccount && watchedToAccount && (
+                {isSameAccount && watchedFromAccountType && watchedToAccount && (
                   <div className="flex items-center space-x-2 text-red-600">
                     <AlertTriangle className="h-4 w-4" />
                     <p className="text-sm">Selecione contas diferentes</p>

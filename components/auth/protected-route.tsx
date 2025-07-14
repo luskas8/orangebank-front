@@ -16,8 +16,12 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       // Evita redirecionamento se já estiver na página de login
-      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
-        router.push('/login');
+      if (typeof window !== 'undefined') {
+        const currentPath = window.location.pathname;
+        if (!currentPath.startsWith('/login') && !currentPath.startsWith('/register')) {
+          console.log('Usuário não autenticado, redirecionando para login...');
+          router.push('/login');
+        }
       }
     }
   }, [isAuthenticated, loading, router]);

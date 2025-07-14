@@ -36,53 +36,58 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   // Use ref to track if initialization has already been attempted
   const hasInitialized = useRef(false);
-  const lastTokenValue = useRef<string | null>(null);
 
   useEffect(() => {
     const initializeAuth = async () => {
       // Só executa no cliente e quando o hook de localStorage estiver pronto
       if (!isClient) {
-        setLoading(false);
-        return;
-      }
-      
-      // Se o token não mudou, não faz nada
-      if (hasInitialized.current && lastTokenValue.current === token) {
         return;
       }
       
       hasInitialized.current = true;
-      lastTokenValue.current = token;
       
       try {
         if (token) {
+          console.log('Token encontrado no localStorage, validando...');
           // Verificar se o token não expirou
-          const decoded: any = jwtDecode(token);
-          if (decoded.exp * 1000 > Date.now()) {
-            try {
-              const userData = await authApi.getProfile();
-              setUser(userData);
-            } catch (profileError: any) {
-              console.error('Erro ao buscar perfil do usuário:', profileError);
-              // Se o token for inválido, remove ele
-              if (profileError.response?.status === 401) {
-                setToken(null);
-                setUser(null);
-              } else {
-                // Se for outro erro, cria um usuário básico com as informações do token
-                setUser({
-                  id: decoded.sub || decoded.userId || '1',
-                  name: decoded.name || 'Usuário',
-                  email: decoded.email || '',
-                  cpf: decoded.cpf || ''
-                });
+          try {
+            const decoded: any = jwtDecode(token);
+            if (decoded.exp * 1000 > Date.now()) {
+              console.log('Token válido, buscando perfil do usuário...');
+              try {
+                const userData = await authApi.getProfile();
+                setUser(userData);
+                console.log('Usuário autenticado com sucesso:', userData.name);
+              } catch (profileError: any) {
+                console.error('Erro ao buscar perfil do usuário:', profileError);
+                // Se o token for inválido, remove ele
+                if (profileError.response?.status === 401) {
+                  console.log('Token inválido, removendo...');
+                  setToken(null);
+                  setUser(null);
+                } else {
+                  // Se for outro erro, cria um usuário básico com as informações do token
+                  console.log('Erro de rede, usando dados do token...');
+                  setUser({
+                    id: decoded.sub || decoded.userId || '1',
+                    name: decoded.name || 'Usuário',
+                    email: decoded.email || '',
+                    cpf: decoded.cpf || ''
+                  });
+                }
               }
+            } else {
+              console.log('Token expirado, removendo...');
+              setToken(null);
+              setUser(null);
             }
-          } else {
+          } catch (decodeError) {
+            console.error('Erro ao decodificar token:', decodeError);
             setToken(null);
             setUser(null);
           }
         } else {
+          console.log('Nenhum token encontrado');
           setUser(null);
         }
       } catch (error) {
@@ -94,7 +99,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
-    initializeAuth();
+    // Só inicializa quando estiver no cliente
+    if (isClient) {
+      initializeAuth();
+    } else {
+      setLoading(false);
+    }
   }, [isClient, token]);
 
   const login = async (data: LoginRequest): Promise<boolean> => {

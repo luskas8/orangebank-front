@@ -23,6 +23,7 @@ const registerSchema = z.object({
     .min(11, 'CPF deve ter 11 dígitos')
     .max(14, 'CPF inválido')
     .regex(/^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/, 'CPF inválido'),
+  birthDate: z.string().min(1, 'Data de nascimento é obrigatória'),
   password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -131,7 +132,22 @@ export default function RegisterPage() {
                   })}
                 />
               </div>
-              {errors.cpf && (
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="birthDate">Data de Nascimento</Label>
+              <Input
+                id="birthDate"
+                type="date"
+                className=""
+                {...register('birthDate')}
+              />
+              {errors.birthDate && (
+                <p className="text-sm text-red-600">{errors.birthDate.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">{errors.cpf && (
                 <p className="text-sm text-red-600">{errors.cpf.message}</p>
               )}
             </div>

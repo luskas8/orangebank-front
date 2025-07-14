@@ -115,10 +115,9 @@ export const BuyAssetModal: React.FC<BuyAssetModalProps> = ({
     setSubmitting(true);
     try {
       await marketApi.buyAsset({
-        accountId: investmentAccount.id,
-        assetId: asset.id,
+        assetSymbol: asset.symbol || asset.id,
         quantity,
-      });
+      }, asset.type || 'stock');
 
       toast({
         title: "Compra realizada!",

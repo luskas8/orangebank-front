@@ -93,10 +93,9 @@ export const SellAssetModal: React.FC<SellAssetModalProps> = ({
     setSubmitting(true);
     try {
       await marketApi.sellAsset({
-        accountId: position.accountId,
-        positionId: position.id,
+        assetSymbol: position.asset.symbol || position.asset.id,
         quantity,
-      });
+      }, position.asset.type || 'stock');
 
       toast({
         title: "Venda realizada!",

@@ -20,7 +20,7 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T)
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
       // Se erro também retorna initialValue
-      console.log(error);
+      console.error('Erro ao acessar localStorage:', error);
       return initialValue;
     }
   });
@@ -35,16 +35,20 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T)
       setStoredValue(valueToStore);
       // Salva no localStorage
       if (typeof window !== 'undefined') {
-        // Para strings simples (como tokens), salva diretamente
-        if (typeof valueToStore === 'string') {
-          window.localStorage.setItem(key, valueToStore);
+        if (valueToStore === null || valueToStore === undefined) {
+          window.localStorage.removeItem(key);
         } else {
-          window.localStorage.setItem(key, JSON.stringify(valueToStore));
+          // Para strings simples (como tokens), salva diretamente
+          if (typeof valueToStore === 'string') {
+            window.localStorage.setItem(key, valueToStore);
+          } else {
+            window.localStorage.setItem(key, JSON.stringify(valueToStore));
+          }
         }
       }
     } catch (error) {
       // Uma implementação mais avançada lidaria com o caso de erro
-      console.log(error);
+      console.error('Erro ao salvar no localStorage:', error);
     }
   };
 

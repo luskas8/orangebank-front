@@ -16,8 +16,12 @@ export const AuthRedirect: React.FC<AuthRedirectProps> = ({ children }) => {
   useEffect(() => {
     if (!loading && isAuthenticated) {
       // Evita redirecionamento se já estiver na página de dashboard
-      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/dashboard')) {
-        router.push('/dashboard');
+      if (typeof window !== 'undefined') {
+        const currentPath = window.location.pathname;
+        if (!currentPath.startsWith('/dashboard')) {
+          console.log('Usuário autenticado, redirecionando para dashboard...');
+          router.push('/dashboard');
+        }
       }
     }
   }, [isAuthenticated, loading, router]);

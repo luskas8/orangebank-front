@@ -12,6 +12,7 @@ import {
   DepositRequest,
   WithdrawRequest,
   TransferRequest,
+  CreateAccountRequest,
   BuyAssetRequest,
   SellAssetRequest,
   ApiResponse 
@@ -125,18 +126,39 @@ export const accountsApi = {
     return response.data;
   },
 
+  createAccount: async (data: CreateAccountRequest): Promise<ApiResponse<Account>> => {
+    const response: AxiosResponse<ApiResponse<Account>> = await externalApi.post('/account/create', {
+      type: data.type,
+      balance: data.balance || 0,
+      active: data.active !== undefined ? data.active : true,
+      userId: data.userId
+    });
+    return response.data;
+  },
+
   deposit: async (data: DepositRequest): Promise<ApiResponse<Transaction>> => {
-    const response: AxiosResponse<ApiResponse<Transaction>> = await externalApi.post('/account/deposit', data);
+    const response: AxiosResponse<ApiResponse<Transaction>> = await externalApi.post('/account/deposit', {
+      amount: data.amount,
+      description: data.description
+    });
     return response.data;
   },
 
   withdraw: async (data: WithdrawRequest): Promise<ApiResponse<Transaction>> => {
-    const response: AxiosResponse<ApiResponse<Transaction>> = await externalApi.post('/account/withdraw', data);
+    const response: AxiosResponse<ApiResponse<Transaction>> = await externalApi.post('/account/withdraw', {
+      amount: data.amount,
+      description: data.description
+    });
     return response.data;
   },
 
   transfer: async (data: TransferRequest): Promise<ApiResponse<Transaction>> => {
-    const response: AxiosResponse<ApiResponse<Transaction>> = await externalApi.post('/account/transfer', data);
+    const response: AxiosResponse<ApiResponse<Transaction>> = await externalApi.post('/account/transfer', {
+      toAccountId: data.toAccountId,
+      fromAccountType: data.fromAccountType,
+      amount: data.amount,
+      description: data.description
+    });
     return response.data;
   },
 
@@ -157,12 +179,20 @@ export const marketApi = {
     
     const stocks = stocksResponse.data.map((stock: any) => ({
       ...stock,
-      assetType: 'stock'
+      type: 'stock',
+      symbol: stock.id,
+      currentPrice: stock.currentPrice,
+      variation: stock.dailyVariation
     }));
     
     const fixedIncomes = fixedIncomeResponse.data.map((asset: any) => ({
       ...asset,
-      assetType: 'fixed-income'
+      type: 'fixed_income',
+      symbol: asset.id,
+      currentPrice: asset.minimumInvestment,
+      interestRate: asset.rate,
+      maturityDate: asset.maturity,
+      minInvestment: asset.minimumInvestment
     }));
     
     return [...stocks, ...fixedIncomes];
@@ -173,7 +203,13 @@ export const marketApi = {
     try {
       const response = await externalApi.get(`/market/stocks`);
       const stock = response.data.find((s: any) => s.id === id);
-      if (stock) return { ...stock, assetType: 'stock' };
+      if (stock) return { 
+        ...stock, 
+        type: 'stock',
+        symbol: stock.id,
+        currentPrice: stock.currentPrice,
+        variation: stock.dailyVariation
+      };
     } catch (error) {
       // Ignora erro e tenta fixed-income
     }
@@ -181,7 +217,15 @@ export const marketApi = {
     try {
       const response = await externalApi.get(`/market/fixed-incomes`);
       const fixedIncome = response.data.find((f: any) => f.id === id);
-      if (fixedIncome) return { ...fixedIncome, assetType: 'fixed-income' };
+      if (fixedIncome) return { 
+        ...fixedIncome, 
+        type: 'fixed_income',
+        symbol: fixedIncome.id,
+        currentPrice: fixedIncome.minimumInvestment,
+        interestRate: fixedIncome.rate,
+        maturityDate: fixedIncome.maturity,
+        minInvestment: fixedIncome.minimumInvestment
+      };
     } catch (error) {
       // Ignora erro
     }
@@ -189,21 +233,21 @@ export const marketApi = {
     throw new Error(`Asset ${id} not found`);
   },
 
-  buyAsset: async (data: BuyAssetRequest): Promise<ApiResponse<Transaction>> => {
+  buyAsset: async (data: BuyAssetRequest, assetType: 'stock' | 'fixed_income'): Promise<ApiResponse<Transaction>> => {
     // Determina o endpoint baseado no tipo de asset
-    const endpoint = data.assetType === 'stock' ? '/market/buy/stock' : '/market/buy/fixed-income';
+    const endpoint = assetType === 'stock' ? '/market/buy/stock' : '/market/buy/fixed-income';
     const response: AxiosResponse<ApiResponse<Transaction>> = await externalApi.post(endpoint, {
-      assetSymbol: data.assetSymbol || data.assetId,
+      assetSymbol: data.assetSymbol,
       quantity: data.quantity
     });
     return response.data;
   },
 
-  sellAsset: async (data: SellAssetRequest): Promise<ApiResponse<Transaction>> => {
+  sellAsset: async (data: SellAssetRequest, assetType: 'stock' | 'fixed_income'): Promise<ApiResponse<Transaction>> => {
     // Determina o endpoint baseado no tipo de asset
-    const endpoint = data.assetType === 'stock' ? '/market/sell/stock' : '/market/sell/fixed-income';
+    const endpoint = assetType === 'stock' ? '/market/sell/stock' : '/market/sell/fixed-income';
     const response: AxiosResponse<ApiResponse<Transaction>> = await externalApi.post(endpoint, {
-      assetSymbol: data.assetSymbol || data.assetId,
+      assetSymbol: data.assetSymbol,
       quantity: data.quantity
     });
     return response.data;

@@ -75,7 +75,6 @@ export const AuthDebugPanel: React.FC = () => {
               <div className="mt-2 pt-2 border-t border-gray-600">
                 <div className="text-gray-400">User ID: {user.id}</div>
                 <div className="text-gray-400">Email: {user.email}</div>
-                <div className="text-gray-400">Accounts: {user.accounts.length}</div>
               </div>
             )}
             
