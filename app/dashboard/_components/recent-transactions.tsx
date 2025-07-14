@@ -105,7 +105,7 @@ export const RecentTransactions: React.FC<RecentTransactionsProps> = ({
                 </div>
                 <div className="text-right">
                   <p className={`text-sm font-semibold ${getAmountColor(transaction.type)}`}>
-                    {transaction.type === 'withdraw' || transaction.type === 'buy' ? '-' : '+'}
+                    {transaction.fromAccountId && !transaction.toAccountId ? '-' : '+'}
                     {formatCurrency(transaction.amount)}
                   </p>
                 </div>
