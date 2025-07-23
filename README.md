@@ -18,6 +18,13 @@ Frontend para o hackathon do Orange Juice, com o desafio de criar um mini banco 
 
 Este projeto é o frontend desenvolvido para o hackathon do Orange Juice, com o objetivo de criar um mini banco de investimentos. O sistema permite simular operações bancárias e de investimentos, focando em experiência de usuário e boas práticas de desenvolvimento web.
 
+<p align="center">
+  <img src="./orangebank.png" alt="OrangeBank" width="400" height="400"/>
+</p>
+<p align="center">
+  <img src="./orangebank-dash.png" alt="OrangeBank dashboard" width="400" height="400"/>
+</p>
+
 ---
 
 ## 🛠 Tecnologias Utilizadas
