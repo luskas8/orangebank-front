@@ -4,13 +4,13 @@ Frontend para o hackathon do Orange Juice, com o desafio de criar um mini banco 
 
 ## 📋 Índice
 
-- [Sobre o Projeto](#sobre-o-projeto)
-- [Tecnologias Utilizadas](#tecnologias-utilizadas)
-- [Como Rodar o Projeto](#como-rodar-o-projeto)
-- [Estrutura de Pastas](#estrutura-de-pastas)
-- [Contribuição](#contribuição)
-- [Autor](#autor)
-- [Licença](#licença)
+  [Sobre o Projeto](#sobre-o-projeto)
+  [Tecnologias Utilizadas](#tecnologias-utilizadas)
+  [Como Rodar o Projeto](#como-rodar-o-projeto)
+  [Estrutura de Pastas](#estrutura-de-pastas)
+  [Contribuição](#contribuição)
+  [Autor](#autor)
+  [Licença](#licença)
 
 ---
 
