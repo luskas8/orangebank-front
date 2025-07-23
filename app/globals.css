@@ -118,6 +118,10 @@
 
 .banking-card-secondary {
   @apply bg-gradient-to-br from-[#CFDBD5] to-[#A8C2B0] text-[#333533];
+  
+  &:hover {
+    @apply bg-gradient-to-br from-[#A8C2B0] to-[#CFDBD5];
+  }
 }
 
 /* Botões customizados */
@@ -154,4 +158,13 @@
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   @apply bg-[#D97706];
+}
+
+/* No Scrollbar */
+.custom-scrollbar-no::-webkit-scrollbar {
+  display: none;
+}
+.custom-scrollbar-no {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }

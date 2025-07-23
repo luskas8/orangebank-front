@@ -105,6 +105,7 @@ export const authApi = {
   getProfile: async (): Promise<User> => {
     try {
       const response: AxiosResponse<User> = await api.get('/auth/profile');
+      console.log('Perfil do usuário obtido:', response.data);
       return response.data;
     } catch (error: any) {
       console.error('Erro ao buscar perfil:', error);

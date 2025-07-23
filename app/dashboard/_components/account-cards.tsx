@@ -6,6 +6,7 @@ import { Account } from '@/lib/types';
 import { Wallet, TrendingUp, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 interface AccountCardsProps {
   currentAccount?: Account;
@@ -61,20 +62,22 @@ export const AccountCards: React.FC<AccountCardsProps> = ({
 
       {/* Conta Investimento */}
       <Card className="banking-card-secondary">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
-            Conta Investimento
-          </CardTitle>
-          <TrendingUp className="h-5 w-5 text-[#F18805]" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold text-[#333533] animate-count-up">
-            {formatBalanceDisplay(investmentAccount?.balance ?? 0)}
-          </div>
-          <p className="text-xs text-[#333533]/70">
-            Patrimônio em investimentos
-          </p>
-        </CardContent>
+        <Link href="/investments" className="block">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Conta Investimento
+              </CardTitle>
+              <TrendingUp className="h-5 w-5 text-[#F18805]" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-[#333533] animate-count-up">
+                {formatBalanceDisplay(investmentAccount?.balance ?? 0)}
+              </div>
+              <p className="text-xs text-[#333533]/70">
+                Patrimônio em investimentos
+              </p>
+            </CardContent>
+        </Link>
       </Card>
     </div>
   );

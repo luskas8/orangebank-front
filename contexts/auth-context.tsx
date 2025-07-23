@@ -62,6 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               console.log('Token válido, buscando perfil do usuário...');
               try {
                 const userData = await authApi.getProfile();
+                console.log('Perfil do usuário obtido:', userData);
                 setUser(userData);
                 console.log('Usuário autenticado com sucesso:', userData.name);
               } catch (profileError: any) {

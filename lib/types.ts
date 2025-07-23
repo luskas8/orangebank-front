@@ -14,7 +14,8 @@ export interface Account {
 
 export interface Transaction {
   id: string;
-  type: 'deposit' | 'withdraw' | 'transfer' | 'buy' | 'sell';
+  type: 'internal' | 'external' | 'asset_purchase' | 'asset_sale';
+  category: 'deposit' | 'withdrawal' | 'transfer' | 'investment';
   amount: number;
   date: string;
   description: string;
